@@ -1,0 +1,57 @@
+{% set name = "py-cpuinfo2" %}
+{% set version = "10.1.1" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-','_') }}-{{ version }}.tar.gz
+  sha256: 7861133863663f16e06eca63b12904ef100b5760415e92372dac0162799a4771
+
+build:
+  number: 0
+  skip: true  # [py<39]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+  entry_points:
+    - cpuinfo = cpuinfo.__main__:main
+
+requirements:
+  host:
+    - python
+    - pip
+    - hatchling
+  run:
+    - python
+
+{% set skip_tests = "" %}
+
+test:
+  source_files:
+    - tests
+  imports:
+    - cpuinfo
+  requires:
+    - pip
+    - pytest
+  commands:
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -vv {{ skip_tests }} tests
+
+about:
+  home: https://github.com/akx/py-cpuinfo2
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: A module for getting CPU info with pure Python
+  description: |
+    Py-cpuinfo gets CPU info with pure Python. Py-cpuinfo should work without any extra
+    programs or libraries, beyond what your OS provides. It does not require any 
+    compilation(C/C++, assembly, et cetera) to use. It works with Python 3.
+  dev_url: https://github.com/akx/py-cpuinfo2
+  doc_url: https://github.com/akx/py-cpuinfo2
+
+extra:
+  recipe-maintainers:
+    - TS-ANC
